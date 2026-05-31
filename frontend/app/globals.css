@@ -1,0 +1,19 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .input-field {
+    @apply w-full rounded-lg border border-border bg-board px-3 py-2 text-sm text-text placeholder:text-text-muted/60 focus:border-accent focus:outline-none disabled:opacity-50;
+  }
+  .btn-primary {
+    @apply rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-accent-muted disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .btn-secondary {
+    @apply rounded-lg border border-border px-4 py-2 text-sm text-text-muted hover:bg-card;
+  }
+}
+
+body {
+  @apply bg-board text-text antialiased;
+}

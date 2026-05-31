@@ -1,0 +1,86 @@
+services:
+  ollama:
+    image: ollama/ollama
+    container_name: ai-kanban-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-data:/root/.ollama
+    environment:
+      NVIDIA_VISIBLE_DEVICES: all
+    gpus: all
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+
+  ollama-init:
+    image: ollama/ollama
+    container_name: ai-kanban-ollama-init
+    depends_on:
+      ollama:
+        condition: service_healthy
+    environment:
+      OLLAMA_HOST: http://ollama:11434
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        echo "Pulling model llama3.2:3b (skip if already exists)..."
+        ollama pull llama3.2:3b
+    restart: "no"
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: ai-kanban-backend
+    ports:
+      - "8000:8000"
+    environment:
+      DATA_DIR: /app/data
+      OLLAMA_BASE_URL: http://ollama:11434
+      OLLAMA_MODEL: "llama3.2:3b"
+      OLLAMA_TIMEOUT_SECONDS: "180"
+      CORS_ORIGINS: http://localhost:3000,http://localhost,http://frontend:3000
+      LOG_LEVEL: INFO
+    volumes:
+      - backend-data:/app/data
+    depends_on:
+      ollama:
+        condition: service_healthy
+      ollama-init:
+        condition: service_completed_successfully
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health')",
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: ai-kanban-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      BACKEND_URL: http://backend:8000
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  ollama-data:
+  backend-data:
