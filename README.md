@@ -2,16 +2,6 @@
 
 全端 AI 任務管理板：Next.js 前端 + FastAPI 後端 + 本地 Ollama（GPU）。
 
-## 功能特色
-
-Kanban 看板管理（Todo / Doing / Done）
-任務新增、編輯、刪除
-拖曳移動與狀態更新
-AI 自動拆解任務為子任務
-本地 Ollama AI 整合
-任務資料同步與即時更新
-
-
 ## 專案結構
 
 ```
