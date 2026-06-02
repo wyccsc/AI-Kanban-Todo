@@ -139,3 +139,6 @@ Ollama 容器使用 `gpus: all`。需 NVIDIA 驅動 + Docker GPU 支援。
 ```powershell
 docker run --rm --gpus all nvidia/cuda:12.0.0-base-ubuntu22.04 nvidia-smi
 ```
+## Demo
+
+Video: [AI Kanban Todo App](https://youtu.be/jT1KojV2GLQ)
